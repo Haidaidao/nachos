@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "fstream": "c",
+        "*.tcc": "c",
+        "numeric": "c",
+        "ostream": "c",
+        "sstream": "c",
+        "algorithm": "cpp"
+    }
+}
