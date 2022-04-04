@@ -119,7 +119,7 @@ ExceptionHandler(ExceptionType which)
    			interrupt->Halt();
 			break;
 		case SC_Create:
-			{
+		{
 			int virtAddr;
 			char* filename;
 			DEBUG('a',"\n SC_Create call ...");
@@ -160,13 +160,62 @@ ExceptionHandler(ExceptionType which)
 			delete filename;
 			IncreasePC();
 			break;
-			}
-		/*default:
+		}
+		/*case SC_ReadString:
+		{
+			int size;
+			char str[200];
+			int a;
+			size = machine->ReadRegister(5);
+			a = machine->ReadRegister(4);
+			size = gSynchConsole->Read(str,size);
+			System2User(a,size,str);
+			IncreasePC();
+			break;
+		}
+		case SC_PrintString:
+		{
+			int size;
+			char* str;
+			size = machine->ReadRegister(4);
+			str = User2System(size,200);
+			gSynchConsole->Write(str,200);
+			break;
+		}*/
+		default:
 			printf("Unexpected user mode exception %d %d\n", which, type);
 			ASSERT(FALSE);	
-			interrupt->Halt();*/
+			interrupt->Halt();
 		}
 		break;
+	case PageFaultException:
+		printf("No valid translation found\n");
+		ASSERT(FALSE);	
+		interrupt->Halt();
+	case ReadOnlyException:
+		printf("Write attempted to page marked \"read-only\"\n");
+		ASSERT(FALSE);	
+		interrupt->Halt();
+	case BusErrorException:
+		printf("Translation resulted in an invalid physical address\n");
+		ASSERT(FALSE);	
+		interrupt->Halt();
+	case AddressErrorException:
+		printf("Unaligned reference or one that was beyond the end of the address space\n");
+		ASSERT(FALSE);
+		interrupt->Halt();
+	case OverflowException:
+		printf("Integer overflow in add or sub\n");
+		ASSERT(FALSE);	
+		interrupt->Halt();
+	case IllegalInstrException:
+		printf("Unimplemented or reserved instr\n");
+		ASSERT(FALSE);	
+		interrupt->Halt();
+	case NumExceptionTypes:
+		printf("NumExceptionTypes\n");
+		ASSERT(FALSE);
+		interrupt->Halt();
 	default:
 		printf("Unexpected user mode exception %d %d\n", which, type);
 		ASSERT(FALSE);

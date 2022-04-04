@@ -29,6 +29,8 @@
 #define SC_Close	8
 #define SC_Fork		9
 #define SC_Yield	10
+#define SC_ReadString	11
+#define SC_PrintString	12
 
 #ifndef IN_ASM
 
@@ -122,7 +124,11 @@ void Fork(void (*func)());
 /* Yield the CPU to another runnable thread, whether in this address space 
  * or not. 
  */
-void Yield();		
+void Yield();	
+
+void ReadString(char buffer[], int length);
+
+void PrintString(char buffer[]);	
 
 #endif /* IN_ASM */
 
