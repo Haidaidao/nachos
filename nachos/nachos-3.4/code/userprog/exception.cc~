@@ -26,6 +26,7 @@
 #include "syscall.h"
 
 #define MaxFileLength 32
+#define MaxLength 255
 
 //----------------------------------------------------------------------
 // ExceptionHandler
@@ -101,8 +102,7 @@ void IncreasePC()
 }
 
 
-void
-ExceptionHandler(ExceptionType which)
+void ExceptionHandler(ExceptionType which)
 {
     int type = machine->ReadRegister(2);
 
@@ -163,7 +163,7 @@ ExceptionHandler(ExceptionType which)
 		}
 		case SC_ReadString:
 		{
-			int size;
+			/*int size;
 			char str[200];
 			int a;
 			size = machine->ReadRegister(5);
@@ -171,15 +171,67 @@ ExceptionHandler(ExceptionType which)
 			size = gSynchConsole->Read(str,size);
 			System2User(a,size,str);
 			IncreasePC();
+			break;*/
+
+			/*int virtAddr, length;
+			char* buffer;
+			length = machine->ReadRegister(5);
+			virtAddr = machine->ReadRegister(4);
+			User2System(virtAddr, length);
+			gSynchConsole->Read(buffer,length);
+			System2User(virtAddr,length,buffer);
+			delete buffer;
+			IncreasePC();
+			break;*/
+
+			char* buf = new char[MaxLength];
+			if(buf == 0)
+			{
+				delete[] buf;
+				IncreasePC();
+				break;
+			}
+			int length = machine->ReadRegister(5);
+			int virtAddr = machine->ReadRegister(4);
+			int sz = gSynchConsole->Read(buf,length);			
+			System2User(virtAddr, sz, buf);
+			delete[] buf;
+			IncreasePC();
 			break;
 		}
 		case SC_PrintString:
 		{
-			int size;
+			/*int size;
 			char* str;
 			size = machine->ReadRegister(4);
 			str = User2System(size,200);
 			gSynchConsole->Write(str,200);
+			IncreasePC();
+			break;*/
+
+			/*int virtAddr;
+			char* buffer;
+			virtAddr = machine->ReadRegister(4);
+			buffer = User2System(virtAddr,255);
+			int length = 0;		
+			while(buffer[length] != 0) length++;
+			gSynchConsole->Write(buffer,length + 1);
+			delete buffer;
+			IncreasePC();
+			break;*/
+			
+			int virtAddr = machine->ReadRegister(4);
+			int i = 0;
+			char *buf = new char[MaxLength];
+			buf = User2System(virtAddr, MaxLength + 1);
+			while(buf[i] != 0 && buf[i] != '\n')
+			{
+				gSynchConsole->Write(buf + i,1);
+				i++;
+			}
+			gSynchConsole->Write(buf + i,1);
+			delete[] buf;
+			IncreasePC();
 			break;
 		}
 		default:
