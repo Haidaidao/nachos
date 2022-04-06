@@ -3,11 +3,7 @@
 
 int main()
 {
-	char str[50];
-	PrintString("Nhap chuoi: ");
-	ReadString(str,50);
-	PrintString(str);
-	
+	PrintChar('p');
 
 	
 	Halt();

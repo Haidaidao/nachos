@@ -3,10 +3,10 @@
 
 int main()
 {
-	char str[50];
-	//PrintString("Nhap chuoi: ");
-	ReadString(str,50);
-	//PrintString(str);
+	char chr;
+	PrintString("Nhap ki tu: ");
+	chr = ReadChar();
+	PrintChar(chr);
 	
 
 	
