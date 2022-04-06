@@ -3,11 +3,10 @@
 
 int main()
 {
-	char chr;
-	PrintString("Nhap ki tu: ");
-	chr = ReadChar();
-	PrintChar(chr);
-	
+	int num = 2147483648;
+	//PrintString("Nhap so vao: ");
+	//num = ReadInt();
+	PrintInt(num);
 
 	
 	Halt();
