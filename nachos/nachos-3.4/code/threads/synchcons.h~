@@ -1,4 +1,6 @@
 // CAE - MULTI - SYNCHCONSOLE DEFINITION
+#ifndef SYNCHCONS_H
+#define SYNCHCONS_H
 
 #include "console.h"
 
@@ -17,3 +19,4 @@ private:
 
 // CAE - MULTI - END SECTION
 
+#endif

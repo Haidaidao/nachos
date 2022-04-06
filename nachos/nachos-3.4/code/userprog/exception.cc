@@ -26,6 +26,7 @@
 #include "syscall.h"
 
 #define MaxFileLength 32
+#define MaxLength 255
 
 //----------------------------------------------------------------------
 // ExceptionHandler
@@ -52,23 +53,23 @@
 
 char* User2System(int virtAddr,int limit)
 {
-int i;// index
-int oneChar;
-char* kernelBuf = NULL;
-kernelBuf = new char[limit +1];//need for terminal string
-if (kernelBuf == NULL)
-return kernelBuf;
-memset(kernelBuf,0,limit+1);
-//printf("\n Filename u2s:");
-for (i = 0 ; i < limit ;i++)
-{
-machine->ReadMem(virtAddr+i,1,&oneChar);
-kernelBuf[i] = (char)oneChar;
-//printf("%c",kernelBuf[i]);
-if (oneChar == 0)
-break;
-}
-return kernelBuf;
+	int i;// index
+	int oneChar;
+	char* kernelBuf = NULL;
+	kernelBuf = new char[limit +1];//need for terminal string
+	if (kernelBuf == NULL)
+	return kernelBuf;
+	memset(kernelBuf,0,limit+1);
+	//printf("\n Filename u2s:");
+	for (i = 0 ; i < limit ;i++)
+	{
+		machine->ReadMem(virtAddr+i,1,&oneChar);
+		kernelBuf[i] = (char)oneChar;
+		//printf("%c",kernelBuf[i]);
+		if (oneChar == 0)
+		break;
+	}
+	return kernelBuf;
 }
 
 // Input: - User space address (int)
@@ -78,16 +79,16 @@ return kernelBuf;
 // Purpose: Copy buffer from System memory space to User memory space
 int System2User(int virtAddr,int len,char* buffer)
 {
-if (len < 0) return -1;
-if (len == 0)return len;
-int i = 0;
-int oneChar = 0 ;
-do{
-oneChar= (int) buffer[i];
-machine->WriteMem(virtAddr+i,1,oneChar);
-i ++;
-}while(i < len && oneChar != 0);
-return i;
+	if (len < 0) return -1;
+	if (len == 0)return len;
+	int i = 0;
+	int oneChar = 0 ;
+	do{
+		oneChar= (int) buffer[i];
+		machine->WriteMem(virtAddr+i,1,oneChar);
+		i ++;
+	}while(i < len && oneChar != 0);
+	return i;
 }
 
 
@@ -101,8 +102,7 @@ void IncreasePC()
 }
 
 
-void
-ExceptionHandler(ExceptionType which)
+void ExceptionHandler(ExceptionType which)
 {
     int type = machine->ReadRegister(2);
 
@@ -119,7 +119,7 @@ ExceptionHandler(ExceptionType which)
    			interrupt->Halt();
 			break;
 		case SC_Create:
-			{
+		{
 			int virtAddr;
 			char* filename;
 			DEBUG('a',"\n SC_Create call ...");
@@ -160,13 +160,92 @@ ExceptionHandler(ExceptionType which)
 			delete filename;
 			IncreasePC();
 			break;
+		}
+		case SC_ReadString:
+		{
+			char* buf = new char[MaxLength]; // allocate buffer
+			if(buf == 0) // if there are not enough no memory
+			{
+				delete[] buf;
+				IncreasePC();
+				break;
 			}
-		/*default:
+			int virtAddr = machine->ReadRegister(4); // get first parameter
+			int length = machine->ReadRegister(5); // get second parameter
+			int sz = gSynchConsole->Read(buf,length); // read from console
+			System2User(virtAddr, sz, buf); // transfer to user space
+			delete[] buf; // deallocate buffer
+			IncreasePC();
+			break;
+		}
+		case SC_PrintString:
+		{
+			int virtAddr = machine->ReadRegister(4); // get parameter
+			int i = 0;
+			char *buf = new char[MaxLength]; // allocate buffer
+			buf = User2System(virtAddr, MaxLength + 1); // transfer to kernel space 
+			while(buf[i] != 0 && buf[i] != '\n') // print one character at a time until 0(end of buffer) or \n(endline)
+			{
+				gSynchConsole->Write(buf + i,1);
+				i++;
+			}
+			//gSynchConsole->Write(buf + i,1); 
+			delete[] buf; // deallocate buffer
+			IncreasePC();
+			break;
+		}
+		case SC_ReadChar:
+		{
+			char buf;
+			gSynchConsole->Read(&buf,1); //read from console
+			machine->WriteRegister(2,buf);
+			IncreasePC();
+			break;
+		}
+		case SC_PrintChar:
+		{
+			char *buf = new char;
+			*buf = machine->ReadRegister(4); // get parameter  
+			
+			gSynchConsole->Write(buf,1);
+			delete buf;
+			IncreasePC();
+			break;
+		}
+		default:
 			printf("Unexpected user mode exception %d %d\n", which, type);
 			ASSERT(FALSE);	
-			interrupt->Halt();*/
+			interrupt->Halt();
 		}
 		break;
+	case PageFaultException:
+		printf("No valid translation found\n");
+		ASSERT(FALSE);	
+		interrupt->Halt();
+	case ReadOnlyException:
+		printf("Write attempted to page marked \"read-only\"\n");
+		ASSERT(FALSE);	
+		interrupt->Halt();
+	case BusErrorException:
+		printf("Translation resulted in an invalid physical address\n");
+		ASSERT(FALSE);	
+		interrupt->Halt();
+	case AddressErrorException:
+		printf("Unaligned reference or one that was beyond the end of the address space\n");
+		ASSERT(FALSE);
+		interrupt->Halt();
+	case OverflowException:
+		printf("Integer overflow in add or sub\n");
+		ASSERT(FALSE);	
+		interrupt->Halt();
+	case IllegalInstrException:
+		printf("Unimplemented or reserved instr\n");
+		ASSERT(FALSE);	
+		interrupt->Halt();
+	case NumExceptionTypes:
+		printf("NumExceptionTypes\n");
+		ASSERT(FALSE);
+		interrupt->Halt();
 	default:
 		printf("Unexpected user mode exception %d %d\n", which, type);
 		ASSERT(FALSE);
