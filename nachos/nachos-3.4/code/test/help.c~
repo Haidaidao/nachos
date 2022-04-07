@@ -33,8 +33,7 @@ int main()
         PrintString("+Step 4, use printArray function to output array after sorting");
         PrintChar('\n');
         PrintString("+Step 5, frees up memory for pointer A");
-
-        PrintChar('\n');
+       
 	Halt();
 	return 0;
 }

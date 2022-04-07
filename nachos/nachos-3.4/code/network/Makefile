@@ -727,6 +727,7 @@ network.o: ../machine/network.cc /usr/include/stdc-predef.h \
  ../threads/list.h ../machine/stats.h ../machine/timer.h \
  ../threads/synchcons.h ../machine/console.h ../filesys/synchdisk.h \
  ../machine/disk.h ../threads/synch.h ../network/post.h \
- ../machine/network.h ../threads/synchlist.h ../threads/synch.h# DEPENDENCIES MUST END AT END OF FILE
+ ../machine/network.h ../threads/synchlist.h ../threads/synch.h
+# DEPENDENCIES MUST END AT END OF FILE
 # IF YOU PUT STUFF HERE IT WILL GO AWAY
 # see make depend above
