@@ -194,7 +194,7 @@ void ExceptionHandler(ExceptionType which)
 				break;
 			}
 			buf = User2System(virtAddr, MaxLength + 1); // transfer to kernel space 
-			while(buf[i] != 0 && buf[i] != '\n') // print one character at a time until 0(end of buffer) or \n(endline)
+			while(buf[i] != 0) //&& buf[i] != '\n') // print one character at a time until 0(end of buffer) or \n(endline)
 			{
 				gSynchConsole->Write(buf + i,1);
 				i++;
@@ -233,31 +233,32 @@ void ExceptionHandler(ExceptionType which)
 			}
 			int length = gSynchConsole->Read(buf,MaxLength); // read from console
 			
-			if(((buf[0] < 48)&&(buf[0] != '-')) || (buf[0] > 57))
-			{
+			if(((buf[0] < 48)&&(buf[0] != '-')) || (buf[0] > 57))	// check the first character 
+			{							// (because it can be '-' for negative value)
 				delete[] buf;
 				machine->WriteRegister(2,0);
 				IncreasePC();
 				break;
 			}
 
-			bool neg = (buf[0] == '-')? 1:0;
+			bool neg = (buf[0] == '-')? 1:0; // check if the integer value is negtive
 			int number = 0;
 			int first_num_index = (neg)? 1:0;
 			
 			bool notint = 0;
-			for(int i = first_num_index; i < length; i++)
-			{
+			for(int i = first_num_index; i < length; i++) 	// get the integer value from the string(buf) 
+			{						// start from left most numeric character
 				if((buf[i] < 48) || (buf[i] > 57))
-				{
+				{	
+					// if any character is not a number (0 -> 9) mean it is not integer
 					delete[] buf;
 					machine->WriteRegister(2,0);
 					notint = 1;
 					break;
 				}
 
-				unsigned int temp = 10*number + (int)(buf[i] - 48);
-				if (temp > 2147483647)
+				unsigned int temp = 10*number + (int)(buf[i] - 48); 
+				if (temp > 2147483647) // check if the value is larger than what integer can store
 				{
 					delete[] buf;
 					//printf("Long");
@@ -275,7 +276,7 @@ void ExceptionHandler(ExceptionType which)
 				break;
 			}
 
-			machine->WriteRegister(2,(neg)? -number:number);
+			machine->WriteRegister(2,(neg)? -number:number); // return number (pos/neg)
 			IncreasePC();
 			break;	
 		}
@@ -284,24 +285,24 @@ void ExceptionHandler(ExceptionType which)
 			int* num = new int;
 			*num = machine->ReadRegister(4); // get parameter
 
-			if(*num == 0) gSynchConsole->Write("0" , 1);
+			if(*num == 0) gSynchConsole->Write("0" , 1); // special case to for 0
 
-			bool neg = (*num < 0)? 1:0;
+			bool neg = (*num < 0)? 1:0; // check if the number is negative
 			if(neg) *num = -*num;
 			//if (!neg) printf("Neg");
 			char* str = new char[15];
 			int i = 14;
 			
 
-			while (*num != 0)
+			while (*num != 0) // get each number of the interger start from right most
 			{
 				//printf("%d",*num % 10);
-				str[i] = *num % 10 + 48;
+				str[i] = *num % 10 + 48; 
 				i--;
 				*num /= 10;
 			}
 
-			if (neg) 
+			if (neg) // add - if negative
 			{
 				str[i] = '-';
 				i--;
@@ -310,7 +311,7 @@ void ExceptionHandler(ExceptionType which)
 			//char *buf = new char[15];
 			//buf = User2System((int) str, 15); // transfer to kernel space 
 			
-			gSynchConsole->Write(str + i + 1 , 14 - i + 1);
+			gSynchConsole->Write(str + i + 1 , 14 - i + 1); // write to console
 
 			delete num;
 			delete[] str;
