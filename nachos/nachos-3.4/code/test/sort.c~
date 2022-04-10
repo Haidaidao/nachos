@@ -49,8 +49,6 @@ int main()
 				}
 			}
 	
-	PrintChar('\n');
-	
 	PrintString("Array: ");
 	for (i = 0; i < n; i++)		
    	{

@@ -3,7 +3,10 @@
 
 int main()
 {
-	PrintChar('p');
+	int n;
+	n = ReadInt();
+
+	PrintInt(n);
 
 	
 	Halt();
