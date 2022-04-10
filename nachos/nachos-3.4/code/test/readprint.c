@@ -3,7 +3,11 @@
 
 int main()
 {
-	PrintChar('p');
+	int num;
+	PrintString("Enter a number: ");
+	num = ReadInt();
+	PrintString("The number is ");
+	PrintInt(num);
 
 	
 	Halt();

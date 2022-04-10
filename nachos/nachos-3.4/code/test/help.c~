@@ -24,7 +24,7 @@ int main()
         PrintChar('\n');
         PrintString("-Ideas for sort codes:");
         PrintChar('\n');
-        PrintString("+Step 1, use the readInt function to enter the value n is the size of the array, If <= 100 print the string re-enter.")
+        PrintString("+Step 1, use the readInt function to enter the value n is the size of the array, If <= 100 print the string re-enter.");
         PrintChar('\n');
         PrintString("+Step 2, next, allocate a dynamic array called A of size n");
         PrintChar('\n');

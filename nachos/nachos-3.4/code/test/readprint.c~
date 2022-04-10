@@ -3,11 +3,11 @@
 
 int main()
 {
-	char chr;
-	PrintString("Nhap ki tu: ");
-	chr = ReadChar();
-	PrintChar(chr);
-	
+	int num;
+	PrintString("Enter\t a number: ");
+	num = ReadInt();
+	PrintString("The number is ");
+	PrintInt(num);
 
 	
 	Halt();
