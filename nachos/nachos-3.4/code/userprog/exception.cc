@@ -208,8 +208,8 @@ void ExceptionHandler(ExceptionType which)
 		case SC_ReadChar: // char ReadChar();
 		{
 			char buf;
-			gSynchConsole->Read(&buf,1); //read from console
-			machine->WriteRegister(2,buf);
+			gSynchConsole->Read(&buf,1); // read 1 byte from console
+			machine->WriteRegister(2,buf); // return value
 			IncreasePC();
 			break;
 		}
@@ -218,7 +218,8 @@ void ExceptionHandler(ExceptionType which)
 			char *buf = new char;
 			*buf = machine->ReadRegister(4); // get parameter  
 			
-			gSynchConsole->Write(buf,1);
+			//if((*buf >31)&&(*buf < 127))			
+				gSynchConsole->Write(buf,1); // write the character to console
 			delete buf;
 			IncreasePC();
 			break;
@@ -234,10 +235,10 @@ void ExceptionHandler(ExceptionType which)
 			}
 			int length = gSynchConsole->Read(buf,MaxLength); // read from console
 			
-			if(((buf[0] < 48)&&(buf[0] != '-')) || (buf[0] > 57))	// check the first character 
+			if(((buf[0] < 48)&&(buf[0] != '-')) || (buf[0] > 57))	// check the first character specifically
 			{							// (because it can be '-' for negative value)
 				delete[] buf;
-				machine->WriteRegister(2,0);
+				machine->WriteRegister(2,0);	// return 0
 				IncreasePC();
 				break;
 			}
@@ -253,7 +254,7 @@ void ExceptionHandler(ExceptionType which)
 				{	
 					// if any character is not a number (0 -> 9) mean it is not integer
 					delete[] buf;
-					machine->WriteRegister(2,0);
+					machine->WriteRegister(2,0); // return 0
 					notint = 1;
 					break;
 				}
@@ -263,7 +264,7 @@ void ExceptionHandler(ExceptionType which)
 				{
 					delete[] buf;
 					//printf("Long");
-					machine->WriteRegister(2,0);
+					machine->WriteRegister(2,0); // return 0
 					notint = 1;
 					break;
 				}
@@ -286,7 +287,12 @@ void ExceptionHandler(ExceptionType which)
 			int* num = new int;
 			*num = machine->ReadRegister(4); // get parameter
 
-			if(*num == 0) gSynchConsole->Write("0" , 1); // special case to for 0
+			if(*num == 0) 
+			{
+				gSynchConsole->Write("0" , 1); // special case for 0
+				IncreasePC();
+				break;
+			}
 
 			bool neg = (*num < 0)? 1:0; // check if the number is negative
 			if(neg) *num = -*num;
@@ -308,15 +314,12 @@ void ExceptionHandler(ExceptionType which)
 				str[i] = '-';
 				i--;
 			}
-
-			//char *buf = new char[15];
-			//buf = User2System((int) str, 15); // transfer to kernel space 
 			
 			gSynchConsole->Write(str + i + 1 , 14 - i + 1); // write to console
 
 			delete num;
 			delete[] str;
-			//delete[] buf;
+
 			IncreasePC();
 			break;
 			

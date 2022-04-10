@@ -3,7 +3,11 @@
 
 int main()
 {
-	PrintString("Du\nma");
+	int num;
+	PrintString("Enter\t a number: ");
+	num = ReadInt();
+	PrintString("The number is ");
+	PrintInt(num);
 
 	
 	Halt();
