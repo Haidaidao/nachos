@@ -98,11 +98,12 @@ int System2User(int virtAddr,int len,char* buffer)
 
 void IncreasePC()
 {
-	int counter = machine->ReadRegister(PCReg);
-	machine->WriteRegister(PrevPCReg, counter);
-	counter = machine->ReadRegister(NextPCReg);
-	machine->WriteRegister(PCReg, counter);
-	machine->WriteRegister(NextPCReg, counter + 4);
+	int counter = machine->ReadRegister(PCReg);    //get current register value
+	machine->WriteRegister(PrevPCReg, counter);    //let the front register get the current register value
+	counter = machine->ReadRegister(NextPCReg);    //get next register value
+	machine->WriteRegister(PCReg, counter);        //Let the current register get the next register value
+	machine->WriteRegister(NextPCReg, counter + 4);/*With the next register, we want to get the previous register value, we add 4 bytes, 
+                                                         because the distance between 2 registers is 4 bytes.*/
 }
 
 
@@ -194,7 +195,7 @@ void ExceptionHandler(ExceptionType which)
 				break;
 			}
 			buf = User2System(virtAddr, MaxLength + 1); // transfer to kernel space 
-			while(buf[i] != 0) //&& buf[i] != '\n') // print one character at a time until 0(end of buffer) or \n(endline)
+			while(buf[i] != 0) //&& buf[i] != '\n') // print one character at a time until 0(end of buffer)
 			{
 				gSynchConsole->Write(buf + i,1);
 				i++;

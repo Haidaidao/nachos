@@ -3,10 +3,7 @@
 
 int main()
 {
-	int num = 2147483648;
-	//PrintString("Nhap so vao: ");
-	//num = ReadInt();
-	PrintInt(num);
+	PrintString("Du\nma");
 
 	
 	Halt();

@@ -194,7 +194,7 @@ void ExceptionHandler(ExceptionType which)
 				break;
 			}
 			buf = User2System(virtAddr, MaxLength + 1); // transfer to kernel space 
-			while(buf[i] != 0 && buf[i] != '\n') // print one character at a time until 0(end of buffer) or \n(endline)
+			while(buf[i] != 0) //&& buf[i] != '\n') // print one character at a time until 0(end of buffer)
 			{
 				gSynchConsole->Write(buf + i,1);
 				i++;
