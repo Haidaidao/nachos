@@ -35,7 +35,7 @@ CPP = gcc -E
 INCDIR =-I../userprog -I../threads
 CFLAGS = -G 0 -c $(INCDIR)
 
-all: halt shell matmult sort createfile readprint help ascii ping pong scheduler
+all: halt shell matmult sort SvVn sinhvien voinuoc cat copy createfile echo scheduler ping pong checksum
 
 start.o: start.s ../userprog/syscall.h
 	$(CPP) $(CPPFLAGS) start.c > strt.s
@@ -66,29 +66,30 @@ matmult: matmult.o start.o
 	$(LD) $(LDFLAGS) start.o matmult.o -o matmult.coff
 	../bin/coff2noff matmult.coff matmult
 
+echo.o: echo.c
+	$(CC) $(CFLAGS) -c echo.c
+echo: echo.o start.o
+	$(LD) $(LDFLAGS) start.o echo.o -o echo.coff
+	../bin/coff2noff echo.coff echo
+
 createfile.o: createfile.c
 	$(CC) $(CFLAGS) -c createfile.c
 createfile: createfile.o start.o
 	$(LD) $(LDFLAGS) start.o createfile.o -o createfile.coff
 	../bin/coff2noff createfile.coff createfile
 
-readprint.o: readprint.c
-	$(CC) $(CFLAGS) -c readprint.c
-readprint: readprint.o start.o
-	$(LD) $(LDFLAGS) start.o readprint.o -o readprint.coff
-	../bin/coff2noff readprint.coff readprint
+cat.o: cat.c
+	$(CC) $(CFLAGS) -c cat.c
+cat: cat.o start.o
+	$(LD) $(LDFLAGS) start.o cat.o -o cat.coff
+	../bin/coff2noff cat.coff cat
 
-help.o: help.c
-	$(CC) $(CFLAGS) -c help.c
-help: help.o start.o
-	$(LD) $(LDFLAGS) start.o help.o -o help.coff
-	../bin/coff2noff help.coff help
+copy.o: copy.c
+	$(CC) $(CFLAGS) -c copy.c
+copy: copy.o start.o
+	$(LD) $(LDFLAGS) start.o copy.o -o copy.coff
+	../bin/coff2noff copy.coff copy
 
-ascii.o: ascii.c
-	$(CC) $(CFLAGS) -c ascii.c
-ascii: ascii.o start.o
-	$(LD) $(LDFLAGS) start.o ascii.o -o ascii.coff
-	../bin/coff2noff ascii.coff ascii
 
 ping.o: ping.c
 	$(CC) $(CFLAGS) -c ping.c
@@ -106,4 +107,35 @@ scheduler.o: scheduler.c
 	$(CC) $(CFLAGS) -c scheduler.c
 scheduler: scheduler.o start.o
 	$(LD) $(LDFLAGS) start.o scheduler.o -o scheduler.coff
-	../bin/coff2noff scheduler.coff schedulermake
+	../bin/coff2noff scheduler.coff scheduler
+
+
+SvVn.o: SvVn.c
+	$(CC) $(CFLAGS) -c SvVn.c
+SvVn: SvVn.o start.o
+	$(LD) $(LDFLAGS) start.o SvVn.o -o SvVn.coff
+	../bin/coff2noff SvVn.coff SvVn
+
+voinuoc.o: voinuoc.c
+	$(CC) $(CFLAGS) -c voinuoc.c
+voinuoc: voinuoc.o start.o
+	$(LD) $(LDFLAGS) start.o voinuoc.o -o voinuoc.coff
+	../bin/coff2noff voinuoc.coff voinuoc
+
+sinhvien.o: sinhvien.c
+	$(CC) $(CFLAGS) -c sinhvien.c
+sinhvien: sinhvien.o start.o
+	$(LD) $(LDFLAGS) start.o sinhvien.o -o sinhvien.coff
+	../bin/coff2noff sinhvien.coff sinhvien
+
+checkfile.o: checkfile.c
+	$(CC) $(CFLAGS) -c checkfile.c
+checkfile: checkfile.o start.o
+	$(LD) $(LDFLAGS) start.o checkfile.o -o checkfile.coff
+	../bin/coff2noff checkfile.coff checkfile
+
+checksum.o: checksum.c
+	$(CC) $(CFLAGS) -c checksum.c
+checksum: checksum.o start.o
+	$(LD) $(LDFLAGS) start.o checksum.o -o checksum.coff
+	../bin/coff2noff checksum.coff checksum

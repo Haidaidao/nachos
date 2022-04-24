@@ -15,31 +15,48 @@
 
 #include "copyright.h"
 
-/* system call codes -- used by the stubs to tell the kernel which system call
- * is being asked for
- */
-#define SC_Halt		0
 
-#define SC_Exit		1
-#define SC_Exec		2
-#define SC_Join		3
 
-#define SC_Create	4
-#define SC_Open		5
-#define SC_Read		6
-#define SC_Write	7
-#define SC_Close	8
-#define SC_Fork		9
-#define SC_Yield	10
+/////////////////////////////////////////////////
+// 	DH KHTN - DHQG TPHCM			/
+// 	1512034 Nguyen Dang Binh		/
+// 	1512042 Nguyen Thanh Chung		/
+// 	1512123 Hoang Ngoc Duc			/
+/////////////////////////////////////////////////
 
-#define SC_ReadString	11
-#define SC_PrintString	12
-#define SC_ReadInt	13
-#define SC_PrintInt	14
-#define SC_ReadChar	15
-#define SC_PrintChar	16
 
+//Define System call
+
+#define SC_Halt			0
+//System call cho Thao tac
+#define SC_Exit			1
+#define SC_Exec			2
+#define SC_Join			3
+//Syscall cho thao tac tep tin
+#define SC_CreateFile		4
+#define SC_Open			5
+#define SC_Read			6
+#define SC_Write		7
+#define SC_Close		8
+//Syscall cho multithreading
+#define SC_Fork			9
+#define SC_Yield		10
+//Syscall co ban
+#define SC_ReadInt		11
+#define SC_PrintInt		12
+#define SC_ReadChar		13
+#define SC_PrintChar		14
+#define SC_ReadString		15
+#define SC_PrintString		16
+#define SC_Seek			17
+#define SC_Sum			30
+
+// Syscall Semaphore
+#define SC_CreateSemaphore	18
+#define SC_Wait			19
+#define SC_Signal		20
 #ifndef IN_ASM
+
 
 /* The system call interface.  These are the operations the Nachos
  * kernel needs to support, to be able to run user programs.
@@ -50,92 +67,39 @@
  * are then invoked in the Nachos kernel, after appropriate error checking, 
  * from the system call entry point in exception.cc.
  */
-
-/* Stop Nachos, and print out performance stats */
-void Halt();		
  
+int Sum(int a, int b);
 
-/* Address space control operations: Exit, Exec, and Join */
-
-/* This user program is done (status = 0 means exited normally). */
+// Address space control operations: Exit, Exec, and Join
+// Chuong trinh nguoi dung da chay xong (status = 0 nghia la thoat hop le)
 void Exit(int status);	
 
-/* A unique identifier for an executing user program (address space) */
+// A unique identifier for an executing user program (address space)
 typedef int SpaceId;	
- 
-/* Run the executable, stored in the Nachos file "name", and return the 
- * address space identifier
- */
+
+// Chay file thuc thi, luu trong Nachos file ten la "name" va tra ve address space indentifier
 SpaceId Exec(char *name);
- 
-/* Only return once the the user program "id" has finished.  
- * Return the exit status.
- */
+
+// Chi return 1 lan khi chuong trinh nguoi dung voi "id" da chay xong
+// Tra ve trang thai Exit
 int Join(SpaceId id); 	
- 
 
-/* File system operations: Create, Open, Read, Write, Close
- * These functions are patterned after UNIX -- files represent
- * both files *and* hardware I/O devices.
- *
- * If this assignment is done before doing the file system assignment,
- * note that the Nachos file system has a stub implementation, which
- * will work for the purposes of testing out these routines.
- */
- 
-/* A unique identifier for an open Nachos file. */
-typedef int OpenFileId;	
-
-/* when an address space starts up, it has two open files, representing 
- * keyboard input and display output (in UNIX terms, stdin and stdout).
- * Read and Write can be used directly on these, without first opening
- * the console device.
- */
-
-#define ConsoleInput	0  
-#define ConsoleOutput	1  
- 
-/* Create a Nachos file, with "name" */
-int Create(char *name);
-
-/* Open the Nachos file "name", and return an "OpenFileId" that can 
- * be used to read and write to the file.
- */
-OpenFileId Open(char *name);
-
-/* Write "size" bytes from "buffer" to the open file. */
-void Write(char *buffer, int size, OpenFileId id);
-
-/* Read "size" bytes from the open file into "buffer".  
- * Return the number of bytes actually read -- if the open file isn't
- * long enough, or if it is an I/O device, and there aren't enough 
- * characters to read, return whatever is available (for I/O devices, 
- * you should always wait until you can return at least one character).
- */
-int Read(char *buffer, int size, OpenFileId id);
-
-/* Close the file, we're done reading and writing to it. */
-void Close(OpenFileId id);
-
-
-
-/* User-level thread operations: Fork and Yield.  To allow multiple
- * threads to run within a user program. 
+/* Cac thao tac tren tien trinh (Thread) o cap do nguoi dung: 
+ * Fork va Yield. Cho phep nhieu tien trinh chay trong 1 user program
  */
 
 /* Fork a thread to run a procedure ("func") in the *same* address space 
  * as the current thread.
  */
-void Fork(void (*func)());
-
+void Fork(void(*func)());
 /* Yield the CPU to another runnable thread, whether in this address space 
  * or not. 
  */
-void Yield();	
+void Yield();
 
-void ReadString(char buffer[], int length);
-
-void PrintString(char buffer[]);	
+//--------------------1---------------------
+// Dung NachOS, in ra thong so he thong
+void Halt();
 
 int ReadInt();
 
@@ -144,6 +108,60 @@ void PrintInt(int number);
 char ReadChar();
 
 void PrintChar(char character);
+
+void ReadString(char buffer[], int length);
+
+void PrintString(char buffer[]);
+
+//--------------------2---------------------
+// Thao tac he thong voi tep tin: CreateFile, Open, Read, Write, Close
+
+// Dinh danh duy nhat cho cac open file trong Nachos
+typedef int OpenFileId;
+
+/* Khi mot address space khoi dong, no co 2 open files tuong ung cho
+ * input tu ban phim va output ra man hinh (theo UNIX, la stdin va stdout).
+ * Read, Write co the su dung truc tiep ma khong can phai mo console truoc.
+ */
+
+#define ConsoleInput	0  
+#define ConsoleOutput	1  
+
+//Tao mot tep tin tren Nachos voi ten la "name"
+//Tra ve gia tri -1: that bai, 0: thanh cong
+int CreateFile(char *name);
+
+// Mo Nachos file co ten la "name" tra ve OpenFileId dung de doc va ghi file
+OpenFileId Open(char *name, int type);
+
+/* Close the file, we're done reading and writing to it. */
+void Close(OpenFileId id);
+
+//Doc
+/* Read "size" bytes from the open file into "buffer".  
+ * Return the number of bytes actually read -- if the open file isn't
+ * long enough, or if it is an I/O device, and there aren't enough 
+ * characters to read, return whatever is available (for I/O devices, 
+ * you should always wait until you can return at least one character).
+ */
+int Read(char *buffer, int charcount, OpenFileId id);
+
+// Write "size" bytes from "buffer" to the open file.
+int Write(char *buffer, int charcount, OpenFileId id);
+
+//
+int Seek(int pos, OpenFileId id);
+
+
+// Ham cho semaphore
+// Success: 0 - Failed: -1
+// Ham tao 1 semaphore voi ten semaphore
+int CreateSemaphore(char* name, int semval);
+
+int Wait(char* name);
+
+int Signal(char* name);
+
 
 #endif /* IN_ASM */
 

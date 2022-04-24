@@ -5,6 +5,13 @@
 // All rights reserved.  See copyright.h for copyright notice and limitation 
 // of liability and disclaimer of warranty provisions.
 
+/////////////////////////////////////////////////
+// 	DH KHTN - DHQG TPHCM			/
+// 	1512034 Nguyen Dang Binh		/
+// 	1512042 Nguyen Thanh Chung		/
+// 	1512123 Hoang Ngoc Duc			/
+/////////////////////////////////////////////////
+
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
@@ -17,14 +24,13 @@
 #include "timer.h"
 #include "bitmap.h"
 #include "ptable.h"
-
+#include "stable.h"
 
 // Initialization and cleanup routines
 extern void Initialize(int argc, char **argv); 	// Initialization,
 						// called before anything else
 extern void Cleanup();				// Cleanup, called when
 						// Nachos is done.
-
 
 extern Thread *currentThread;			// the thread holding the CPU
 extern Thread *threadToBeDestroyed;  		// the thread that just finished
@@ -35,13 +41,15 @@ extern Timer *timer;				// the hardware alarm clock
 
 #ifdef USER_PROGRAM
 #include "machine.h"
-extern Machine* machine;	// user program memory and registers
 #include "synchcons.h"
-extern SynchConsole *gSynchConsole;
+#include "synch.h"
+extern Machine* machine;	// user program memory and registers
+extern SynchConsole* gSynchConsole;
 
-extern Semaphore *addrLock;
-extern BitMap *gPhysPageBitMap;
-extern PTable *pTab;
+extern Semaphore *addrLock;	// semaphore
+extern BitMap *gPhysPageBitMap;	// quan ly cac frame
+extern PTable *pTab;		// quan ly bang tien trinh
+extern STable *semTab;		// quan ly semaphore
 #endif
 
 #ifdef FILESYS_NEEDED 		// FILESYS or FILESYS_STUB 

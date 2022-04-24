@@ -8,64 +8,25 @@
  */
 
 #include "syscall.h"
-#define N 100
 
+int A[1024];	/* size of physical memory; with code, we'll run out of space!*/
 
-int main()
+int
+main()
 {
-	int i, j, tmp, n = 0;
-	int A[N];
+    int i, j, tmp;
 
-    	/* first input the array, in reverse sorted order */
-	
-	
-	while((n < 1)||(n > N))
-	{
-	PrintString("Enter the number of elements: ");
-	n = ReadInt();
-	}
-	
-	for (i = 0; i < n; i++)		
-	{
-		PrintString("Enter A[");
-		PrintInt(i);
-		PrintString("] = ");
-		A[i] = ReadInt();
-	}
+    /* first initialize the array, in reverse sorted order */
+    for (i = 0; i < 1024; i++)		
+        A[i] = 1024 - i;
 
-	
-	PrintString("Array: ");
-	for (i = 0; i < n; i++)		
-   	{
-		PrintChar(' ');
-		PrintInt(A[i]);	
-	}
-	
-	PrintString("\nSorting... \n");
-
-    	/* then sort! */
-		 for(i=0;i<n;i++){
-				for(j=i+1;j<n;j++){
-				    if(A[i] > A[j]){
-				        tmp = A[i];
-				        A[i] = A[j];
-				        A[j] = tmp;
-				    }
-				}
-			}
-	
-	PrintChar('\n');
-	
-	PrintString("Array: ");
-	for (i = 0; i < n; i++)		
-   	{
-		PrintChar(' ');
-		PrintInt(A[i]);	
-	}
-	
-
-	//delete[]A;
- 	/* and then we're done -- should be 0! */
-	Halt();
-	return 0;
+    /* then sort! */
+    for (i = 0; i < 1023; i++)
+        for (j = i; j < (1023 - i); j++)
+	   if (A[j] > A[j + 1]) {	/* out of order -> need to swap ! */
+	      tmp = A[j];
+	      A[j] = A[j + 1];
+	      A[j + 1] = tmp;
+    	   }
+    Exit(A[0]);		/* and then we're done -- should be 0! */
 }
