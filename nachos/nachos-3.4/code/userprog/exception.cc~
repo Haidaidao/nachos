@@ -324,6 +324,64 @@ void ExceptionHandler(ExceptionType which)
 			break;
 			
 		}
+		case SC_Exec:	//SpaceId Exec(char *name);
+		{
+			int virtAddr = machine->ReadRegister(4);
+			char *name = new char[MaxLength];
+			name = User2System(virtAddr, MaxLength + 1);
+
+			if (name == NULL)
+			{
+				printf("Not enough memory");
+				machine->WriteRegister(2,-1);
+				delete[] name;
+				IncreasePC();
+				break;
+			}
+
+			OpenFile *oFile = fileSystem->Open(name);
+			if(oFile == NULL)
+			{
+				printf("Can't open file %s", name);
+				machine->WriteRegister(2,-1);
+				delete[] name;
+				IncreasePC();
+				break;
+			}
+			
+
+			int ID = pTab->ExecUpdate(name);
+/*			machine->WriteRegister(2,ID);
+
+			delete[] name;
+			IncreasePC();
+			break;*/
+			
+		}
+		case SC_Join: //int Join(SpaceId id); 	
+		{
+			int pID = machine->ReadRegister(4);
+			int res = pTab->JoinUpdate(pID);
+			machine->WriteRegister(2,res);
+			IncreasePC();
+			break;
+		}
+		case SC_Exit: //void Exit(int status);	
+		{
+			int status = machine->ReadRegister(4);
+			if(status != 0)
+			{
+				IncreasePC();
+				break;
+			}
+
+			int res = pTab->ExitUpdate(status);
+
+			currentThread->freeSpace();
+			currentThread->Finish();
+			IncreasePC();
+			break;
+		}
 		default:
 			printf("Unexpected user mode exception %d %d\n", which, type);
 			ASSERT(FALSE);	

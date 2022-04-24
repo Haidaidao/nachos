@@ -38,6 +38,8 @@ Thread::Thread(char* threadName)
     stackTop = NULL;
     stack = NULL;
     status = JUST_CREATED;
+	processID = 0;
+	exitStatus = 0;
 #ifdef USER_PROGRAM
     space = NULL;
 #endif
@@ -316,5 +318,10 @@ Thread::RestoreUserState()
 {
     for (int i = 0; i < NumTotalRegs; i++)
 	machine->WriteRegister(i, userRegisters[i]);
+}
+
+void Thread::freeSpace()
+{
+	if(space != 0) delete space;
 }
 #endif

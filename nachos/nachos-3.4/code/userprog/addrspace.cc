@@ -71,6 +71,7 @@ AddrSpace::AddrSpace(OpenFile *executable)
     	SwapHeader(&noffH);
     ASSERT(noffH.noffMagic == NOFFMAGIC);
 
+	addrLock->P();
 // how big is address space?
     size = noffH.code.size + noffH.initData.size + noffH.uninitData.size 
 			+ UserStackSize;	// we need to increase the size
@@ -82,6 +83,15 @@ AddrSpace::AddrSpace(OpenFile *executable)
 						// to run anything too big --
 						// at least until we have
 						// virtual memory
+	if(numPages > gPhysPageBitMap->NumClear())
+	{
+		printf("\nAddrSpace:Load: not enough memory for new process");
+		numPages = 0;
+		delete executable;
+		addrLock->V();
+		return;
+	}
+
 
     DEBUG('a', "Initializing address space, num pages %d, size %d\n", 
 					numPages, size);
@@ -89,7 +99,11 @@ AddrSpace::AddrSpace(OpenFile *executable)
     pageTable = new TranslationEntry[numPages];
     for (i = 0; i < numPages; i++) {
 	pageTable[i].virtualPage = i;	// for now, virtual page # = phys page #
-	pageTable[i].physicalPage = i;
+	
+	
+	pageTable[i].physicalPage = gPhysPageBitMap->Find();;
+	//gPhysPageBitMap->Mark(id);
+
 	pageTable[i].valid = TRUE;
 	pageTable[i].use = FALSE;
 	pageTable[i].dirty = FALSE;
@@ -97,6 +111,8 @@ AddrSpace::AddrSpace(OpenFile *executable)
 					// a separate page, we could set its 
 					// pages to be read-only
     }
+
+	addrLock->V();
     
 // zero out the entire address space, to zero the unitialized data segment 
 // and the stack segment
@@ -125,7 +141,12 @@ AddrSpace::AddrSpace(OpenFile *executable)
 
 AddrSpace::~AddrSpace()
 {
-   delete pageTable;
+	int i;
+	
+	for(i = 0;i < numPages; i++)
+		gPhysPageBitMap->Clear(pageTable[i].physicalPage);
+
+	delete pageTable;
 }
 
 //----------------------------------------------------------------------
