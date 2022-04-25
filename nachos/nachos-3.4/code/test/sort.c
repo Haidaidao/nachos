@@ -19,7 +19,7 @@ int main()
     	/* first input the array, in reverse sorted order */
 	
 	
-	while((n < 1)||(n > 100))
+	while((n < 1)||(n > N))
 	{
 	PrintString("Enter the number of elements: ");
 	n = ReadInt();

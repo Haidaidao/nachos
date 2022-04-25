@@ -1,6 +1,14 @@
+//	DH KHOA HOC TU NHIEN
+// 	HE DIEU HANH TH2014/3
+// 	DOAN HIEU TAM		-	1412477
+// 	TRAN THI NHA		-	1412363
+// 	NGUYEN DINH SON		-	1412465
+//
+//	FILE synchcons.h
+//	Khai bao cac interface cua lop SynchConsole
+
+
 // CAE - MULTI - SYNCHCONSOLE DEFINITION
-#ifndef SYNCHCONS_H
-#define SYNCHCONS_H
 
 #include "console.h"
 
@@ -19,4 +27,3 @@ private:
 
 // CAE - MULTI - END SECTION
 
-#endif
