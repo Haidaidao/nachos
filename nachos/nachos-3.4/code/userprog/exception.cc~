@@ -324,40 +324,45 @@ void ExceptionHandler(ExceptionType which)
 			break;
 			
 		}
-		case SC_Exec:
+		case SC_Exec: // SpaceId Exec(char *name);
 		{
+			// doc dia chi ten chuong trinh "name" tu thanh ghi r4
 			int virtAddr;
 			virtAddr = machine->ReadRegister(4);	
+			// chuyen vung nho user space toi system space
 			char* name;
 			name = User2System(virtAddr, MaxFileLength + 1); 
-	
+			
 			if(name == NULL)
 			{
-				DEBUG('a', "\n Not enough memory in System");
 				printf("\n Not enough memory in System");
 				machine->WriteRegister(2, -1);
-				//IncreasePC();
-				return;
+				IncreasePC();
+				break;
 			}
+
+			// neu bi loi thi gan "khong mo duoc file" va return -1 
 			OpenFile *oFile = fileSystem->Open(name);
 			if (oFile == NULL)
 			{
 				printf("\nExec:: Can't open this file.");
 				machine->WriteRegister(2,-1);
 				IncreasePC();
-				return;
+				break;
 			}
 
 			delete oFile;
 
-			int id = pTab->ExecUpdate(name); 
-			machine->WriteRegister(2,id);
+			// goi pTab->ExecUpdate
+			int ID = pTab->ExecUpdate(name); 
+			// luu ket qua thuc thi vao thanh ghi r2
+			machine->WriteRegister(2,ID);
 
 			delete[] name;	
 			IncreasePC();
-			return;
+			break;
 		}
-		case SC_Join:
+		case SC_Join: // int Join(SpaceId id); 	
 		{       
 			int id = machine->ReadRegister(4);
 			
@@ -365,26 +370,25 @@ void ExceptionHandler(ExceptionType which)
 			
 			machine->WriteRegister(2, res);
 			IncreasePC();
-			return;
+			break;
 		}
-		case SC_Exit:
+		case SC_Exit: // void Exit(int status);	
 		{
 			int exitStatus = machine->ReadRegister(4);
 
 			if(exitStatus != 0)
 			{
 				IncreasePC();
-				return;
+				break;
 				
 			}			
 			
 			int res = pTab->ExitUpdate(exitStatus);
-			//machine->WriteRegister(2, res);
 
 			currentThread->FreeSpace();
 			currentThread->Finish();
 			IncreasePC();
-			return; 
+			break; 
 				
 		}
 		default:

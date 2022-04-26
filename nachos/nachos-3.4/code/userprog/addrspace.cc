@@ -93,7 +93,7 @@ AddrSpace::AddrSpace(OpenFile *executable)
     // At least until we have virtual memory
     ASSERT(numPages <= NumPhysPages);
 
-    if(numPages > gPhysPageBitMap->NumClear())
+    if(numPages > gPhysPageBitMap->NumClear()) // Bitmap NumClear() return the number of clear bit
     {
 	    printf("\nAddrSpace::Load : not enough memory for new process..!");
 	    numPages = 0;
@@ -112,7 +112,7 @@ AddrSpace::AddrSpace(OpenFile *executable)
 	// for now, virtual page # = phys page #
 	pageTable[i].virtualPage = i;
 
-	pageTable[i].physicalPage = gPhysPageBitMap->Find();
+	pageTable[i].physicalPage = gPhysPageBitMap->Find(); // Bitmap function Find() find the first bit that is clear and mark it at used
 
 	pageTable[i].valid = TRUE;
 	pageTable[i].use = FALSE;

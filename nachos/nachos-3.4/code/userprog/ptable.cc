@@ -1,8 +1,6 @@
 #include "ptable.h"
 #include "system.h"
 
-#define For(i,a,b) for (int i = (a); i < b; ++i)
-
 PTable::PTable(int size)
 {
 	int i = 0;
@@ -14,6 +12,7 @@ PTable::PTable(int size)
 		pcb[i] = NULL;
 	bm->Mark(0);
 
+// vi chua xu ly duoc viec dua tien trinh chinh vao bang tien trinh nen nhom tam thoi gan cung gia tri pcb[0]
 	pcb[0] = new PCB(0);
 	pcb[0]->SetPName("./test/scheduler");
 	pcb[0]->parentID = -1;
@@ -35,19 +34,19 @@ PTable::~PTable()
 
 int PTable::ExecUpdate(char* filename)
 {
-        //Gọi mutex->P(); để giúp tránh tình trạng nạp 2 tiến trình cùng 1 lúc.
+	// Goi mutex->P(); de giup1 tranh tinh trang nap 2 tien trinh cung 1 luc
 	bmsem->P();			//chi nap 1 tien trinh vao mot thoi diem
 
 
 //Kiem tra file co ton tai tren may khong
-// Kiểm tra tính hợp lệ của chương trình “name”.
+// Kiem tra tinh hop le cua chuong trinh "name"
 	if(filename == NULL)
 	{
 		printf("\nPTable::Exec : Can't not execute name is NULL.\n");
 		bmsem->V();
 		return -1;
 	}
-// Kiểm tra sự tồn tại của chương trình “name” bằng cách gọi phương thức Open của lớp fileSystem.
+// Kiem tra su ton tai cua chuong trinh "name" bang cach goi phuong thuc Open cua lop fileSystem
 	OpenFile *executable = fileSystem->Open(filename);
 	if (executable == NULL) 
 	{
@@ -57,8 +56,7 @@ int PTable::ExecUpdate(char* filename)
     	}
 	delete executable;			// close file
 ////////////////////////////////////////////////////////////
-	
-	// So sánh tên chương trình và tên của currentThread để chắc chắn rằng chương trình này không gọi thực thi chính nó.
+// So sanh ten chuong trinh va ten cua currentThread de chac chan rang chuong trinh nay khong goi thuc thi chinh no
 //Kiem tra chuong trinh duoc goi co la chinh no khong
 	if(!strcmp(filename,currentThread->getName()))
 	{
@@ -67,6 +65,7 @@ int PTable::ExecUpdate(char* filename)
 		return -1;
 	}
 ////////////////////////////////////////////////////////////
+// Tim slot trong trong bang pTable
 //Kiem tra con slot trong khong
 	int ID= GetFreeSlot();
 	if(ID==-1)
@@ -76,19 +75,23 @@ int PTable::ExecUpdate(char* filename)
 		return -1;
 	}
 ////////////////////////////////////////////////////////////
-//Nếu có slot trống thì khởi tạo một PCB mới với processID chính là index của slot này
+// Neu co slot trong thi khoi tao mot PCB moi voi processID chinh la index cua slot nay
 	pcb[ID]= new PCB(ID);
 	pcb[ID]->SetPName(filename); 
 	
-// parrentID là processID của currentThread
+// parentID la processID cua currentThread
     	pcb[ID]->parentID = currentThread->processID;
 
+// Danh dau da su dung (ham Find() cua lop bitmap da thuc hien)
 	// bm->Mark(ID); GetFreeSlot call bm->Find() actually also marked the new slot
+
+// Goi thuc thi phuong thuc Exec cua lop PCB
 	int pID= pcb[ID]->Exec(filename,ID);
 
-// Gọi bmsem->V()
+// Goi bmsem->V()
 	bmsem->V();
-// Trả về kết quả thực thi của PCB->Exec.
+
+// Tra ve ket qua thuc thi cua PCB->Exec
 	return pID;
 }
 
@@ -102,7 +105,6 @@ int PTable::ExitUpdate(int ec)
 		printf("\nLoi: Tien trinh khong ton tai !!!\n");
 		return -1;
 	} 
-
 //////////////////////////////////////////////////////////////
 
 //Neu la main process thi Halt()
@@ -112,12 +114,7 @@ int PTable::ExitUpdate(int ec)
 		interrupt->Halt();
 		return 0;
 	}
-
-        if(!IsExist(pID))
-	{
-		printf("\nLoi: Tien trinh khong ton tai !!!\n");
-		return -1;
-	}
+/////////////////////////////////////////////////////////////
 
 	pcb[pID]->SetExitCode(ec);
 	pcb[pcb[pID]->parentID]->DecNumWait();
@@ -148,6 +145,7 @@ int PTable::JoinUpdate(int pID)
 		return -1;
 	}
 
+//kiem tra tien trinh dang chay co la cha cua tien trinh can join hay khong
 	if(currentThread->processID != pcb[pID]->parentID)
 	{
 		printf("\nLoi: Ko duoc phep join vao tien trinh khong phai cha cua no !!!\n");
